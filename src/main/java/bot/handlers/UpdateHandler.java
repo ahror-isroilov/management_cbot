@@ -22,7 +22,7 @@ public class UpdateHandler {
             messageHandler.process(update);
         } else if (update.hasCallbackQuery())
             callbackHandler.process(update);
-        else
+        else if (update.hasMyChatMember())
             otherHandlers.process(update);
     }
 
