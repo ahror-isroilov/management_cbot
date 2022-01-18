@@ -23,7 +23,7 @@ public class UpdateHandler {
         } else if (update.hasCallbackQuery())
             callbackHandler.process(update);
         else
-            messageHandler.process(update);
+            otherHandlers.process(update);
     }
 
     private void writeLog(Update update) {
