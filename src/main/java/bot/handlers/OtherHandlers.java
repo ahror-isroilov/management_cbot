@@ -10,10 +10,6 @@ public class OtherHandlers extends BaseAbstractHandler implements IBaseHandler {
     @Override
     public void process(Update update) {
         Bot bot = Bot.getInstance();
-        Message message = update.getMessage();
-        Long chatId = message.getChatId();
-        String msgText = message.getText();
-        User tgUser = message.getFrom();
         if (update.hasMyChatMember()) {
             SendMessage send = new SendMessage();
             if (update.getMyChatMember().getNewChatMember().getStatus().equals("member") && update.getMyChatMember().getNewChatMember().getUser().getUserName().equals("personalLibraryuzbot")) {
