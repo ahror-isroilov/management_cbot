@@ -17,7 +17,6 @@ public class UpdateHandler {
     }
 
     public void handle(Update update) {
-        //writeLog(update);
         if (update.hasMessage()) {
             messageHandler.process(update);
         } else if (update.hasCallbackQuery())

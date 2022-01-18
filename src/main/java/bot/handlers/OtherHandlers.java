@@ -10,14 +10,12 @@ public class OtherHandlers extends BaseAbstractHandler implements IBaseHandler {
     @Override
     public void process(Update update) {
         Bot bot = Bot.getInstance();
-        if (update.hasMyChatMember()) {
-            SendMessage send = new SendMessage();
-            if (update.getMyChatMember().getNewChatMember().getStatus().equals("member") && update.getMyChatMember().getNewChatMember().getUser().getUserName().equals("personalLibraryuzbot")) {
-                send.setChatId(String.valueOf(update.getMyChatMember().getFrom().getId()));
-                System.out.println(update);
-                send.setText("Assalomu alaykum, siz botni " + update.getMyChatMember().getChat().getTitle() + " guruhiga qo'shdinggiz");
-                bot.executeMessage(send);
-            }
+        SendMessage send = new SendMessage();
+        if (update.getMyChatMember().getNewChatMember().getStatus().equals("member") && update.getMyChatMember().getNewChatMember().getUser().getUserName().equals("management_cbot")) {
+            send.setChatId(String.valueOf(update.getMyChatMember().getFrom().getId()));
+            System.out.println(update);
+            send.setText("Assalomu alaykum, siz botni " + update.getMyChatMember().getChat().getTitle() + " guruhiga qo'shdinggiz");
+            bot.executeMessage(send);
         }
     }
 
