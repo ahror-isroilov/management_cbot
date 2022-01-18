@@ -8,6 +8,7 @@ import bot.utils.Utils;
 public class UpdateHandler {
     private static final UpdateHandler instance = new UpdateHandler();
     private final MessageHandler messageHandler = MessageHandler.getInstance();
+    private final OtherHandlers otherHandlers = OtherHandlers.getInstance();
     private final CallbackHandler callbackHandler = CallbackHandler.getInstance();
     private final LogService logService = LogService.getInstance();
 
@@ -21,12 +22,11 @@ public class UpdateHandler {
             messageHandler.process(update);
         } else if (update.hasCallbackQuery())
             callbackHandler.process(update);
+        else
+            messageHandler.process(update);
     }
 
     private void writeLog(Update update) {
         logService.save(Utils.withoutNulls().toJson(update));
     }
-
-
-
 }
