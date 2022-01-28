@@ -69,6 +69,10 @@ public abstract class AbstractMethods {
         bot.models.User user = repository.getByUserId(user_id);
         return Objects.nonNull(user) && user.getLoggedIn();
     }
+    protected Boolean isActive(Long user_id) {
+        bot.models.User user = repository.getByUserId(user_id);
+        return Objects.nonNull(user) && user.getLoggedIn() &&!user.getBlocked();
+    }
 
     protected Boolean isAdmin(Long user_id) {
         bot.models.User user = repository.getByUserId(user_id);

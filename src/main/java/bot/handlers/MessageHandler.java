@@ -15,6 +15,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendLocation;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.*;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -83,8 +84,7 @@ public class MessageHandler extends AbstractMethods implements IBaseHandler {
             if (unAcceptedList.size() > 0) {
                 sendMessage = msgObject(chatId, "<b>Guruhlarni faollashtirish uchun  ularning ustiga bosing</b>");
                 sendMessage.setReplyMarkup(InlineBoards.prepareButtons(unAcceptedList));
-            }
-            else sendMessage = msgObject(chatId, "<b>Barcha guruhlar faollashtirilgan</b>");
+            } else sendMessage = msgObject(chatId, "<b>Barcha guruhlar faollashtirilgan</b>");
             bot.executeMessage(sendMessage);
         } else if (hasLoggedIn(chatId) && isAdmin(chatId) && message.hasText() && mText.equals("Guruhni o'chirish ➖")) {
             if (acceptedList.size() > 0)
@@ -160,10 +160,16 @@ public class MessageHandler extends AbstractMethods implements IBaseHandler {
                 bot.executeMessage(sendMessage);
             }
         } else if (hasLoggedIn(chatId) && isWorker(chatId) && message.hasText() && mText.equals("Yuborish 📨")) {
-            state.setState(chatId, ActionState.SEND_MESSAGE.getCode());
-            sendMessage = msgObject(chatId, "<b>Guruhga yuborish uchun kerakli ma'lumotlarni jo'nating</b>");
-            sendMessage.setReplyMarkup(MarkupBoards.back());
-            bot.executeMessage(sendMessage);
+            if (isActive(chatId)) {
+                state.setState(chatId, ActionState.SEND_MESSAGE.getCode());
+                sendMessage = msgObject(chatId, "<b>Guruhga yuborish uchun kerakli ma'lumotlarni jo'nating</b>");
+                sendMessage.setReplyMarkup(MarkupBoards.back());
+                bot.executeMessage(sendMessage);
+            } else {
+                sendMessage = msgObject(chatId, "<b>Siz bloklangansiz</b>");
+                sendMessage.setReplyMarkup(new ReplyKeyboardRemove(true));
+                bot.executeMessage(sendMessage);
+            }
         } else if (hasLoggedIn(chatId) && isWorker(chatId) && state.getState(chatId).equals(ActionState.SEND_MESSAGE.getCode())) {
             prepareDocument(update);
             state.setState(chatId, ActionState.SEND_MESSAGE.getCode());
