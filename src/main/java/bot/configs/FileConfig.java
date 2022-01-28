@@ -5,17 +5,14 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class FileConfig {
+    protected Properties p = new Properties();
 
-    private static final FileConfig instance = new FileConfig();
-
-    public static FileConfig getInstance() {
-        return instance;
+    public FileConfig(String path) {
+        load(path);
     }
 
-    private static Properties p;
-
-    static {
-        try (FileReader reader = new FileReader("src/main/resources/db.properties")) {
+    private void load(String path) {
+        try (FileReader reader = new FileReader(path)) {
             p = new Properties();
             p.load(reader);
         } catch (IOException e) {
@@ -23,7 +20,7 @@ public class FileConfig {
         }
     }
 
-    public static String get(String key) {
+    public String get(String key) {
         return p.getProperty(key);
     }
 }

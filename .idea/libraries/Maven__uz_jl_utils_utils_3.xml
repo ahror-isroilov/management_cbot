@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: uz.jl.utils:utils:3">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/uz/jl/utils/utils/3/utils-3.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/uz/jl/utils/utils/3/utils-3-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/uz/jl/utils/utils/3/utils-3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

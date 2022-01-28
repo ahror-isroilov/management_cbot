@@ -1,32 +1,16 @@
 package bot.configs;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.Objects;
+public class DbConfig extends FileConfig {
 
-public class DbConfig {
+    private static DbConfig instance = new DbConfig();
 
-    private static Connection connection;
-
-    public static Connection conn() {
-        try {
-            if (Objects.isNull(connection) || connection.isClosed()) {
-                connection = DriverManager.getConnection(FileConfig.get("db.connection"), "postgres", "alex");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return connection;
+    public static DbConfig getInstance() {
+        return instance;
     }
 
-    public static void close() {
-        try {
-            if (connection != null || !connection.isClosed()) {
-                connection.close();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public DbConfig() {
+        super("src/main/resources/db.properties");
     }
+
+
 }

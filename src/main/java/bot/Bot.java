@@ -3,24 +3,22 @@ package bot;
 import bot.handlers.UpdateHandler;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendAnimation;
-import org.telegram.telegrambots.meta.api.methods.send.SendAudio;
-import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
+import org.telegram.telegrambots.meta.api.methods.send.*;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class Bot extends TelegramLongPollingBot {
 
-    private static UpdateHandler handler = UpdateHandler.getInstance();
+    UpdateHandler handler = UpdateHandler.getInstance();
 
     @Override
     public String getBotUsername() {
-        return "@management_cbot";
+        return "@Emma_cbot";
     }
 
     @Override
     public String getBotToken() {
-        return "5099129358:AAHoLzNGnrNT1wrNPtT24d6pi7Xen2WY1bU";
+        return "5197444772:AAFJm_YnHf6HAGSz0VQyxy8ykzDJjcNz404";
     }
 
     @Override
@@ -36,7 +34,7 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 
-    public void executeAudio(SendAudio message) {
+    public void sendAudio(SendAudio message) {
         try {
             execute(message);
         } catch (TelegramApiException e) {
@@ -44,9 +42,25 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 
-    public void executeAnimation(SendAnimation message) {
+    public void sendPhoto(SendPhoto photo) {
+        try {
+            execute(photo);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendAnimation(SendAnimation message) {
         try {
             execute(message);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendLocation(SendLocation location) {
+        try {
+            execute(location);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }

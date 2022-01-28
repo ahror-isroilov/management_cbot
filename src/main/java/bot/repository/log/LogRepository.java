@@ -1,18 +1,17 @@
 package bot.repository.log;
 
-import bot.configs.FileConfig;
-import bot.repository.AbstractRepository;
+import bot.configs.DbConfig;
+import bot.repository.BaseRepository;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
-public class LogRepository extends AbstractRepository {
-    private static final LogRepository instance = new LogRepository();
+import java.sql.Types;
 
-    public static LogRepository getInstance() {
-        return instance;
-    }
+public class LogRepository extends BaseRepository {
+    DbConfig config = DbConfig.getInstance();
 
-    public void save(String data) {
-        query.append(FileConfig.get("query.log.insert"));
-        getPreparedStatement(data);
-        executeWithout();
+    public void log(Update update) {
+        String data = gson.toJson(update);
+        prepareArguments(data);
+        callProcedure(config.get("log.log"), Types.VARCHAR);
     }
 }

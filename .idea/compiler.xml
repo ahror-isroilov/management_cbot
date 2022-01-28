@@ -10,5 +10,8 @@
         <module name="daza_management" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="daza_management" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>

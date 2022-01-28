@@ -5,10 +5,7 @@ public class Emojis {
     public static final String eBOOKS = "📚";
     public static final String eBOOK = "📘";
     public static final String eNOTES = "🗒";
-    public static final String eFOLDER = "📂";
-    public static final String eUZ = "\uD83C\uDDFA\uD83C\uDDFF";
-    public static final String eRU = "\uD83C\uDDF7\uD83C\uDDFA";
-    public static final String eEN = "\uD83C\uDDEC\uD83C\uDDE7";
+    public static final String eJOIN = "🔅";
     public static final String eSTATISTICS = "🧾";
     public static final String ePHONE1 = "📞";
     public static final String eRATING = "⚜️";

@@ -6,6 +6,7 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import uz.jl.utils.Print;
 
 import static uz.jl.utils.Color.GREEN;
+import static uz.jl.utils.Color.RED;
 
 public class Application {
     public static void main(String[] args) {
@@ -21,7 +22,8 @@ public class Application {
             statusText = "Connected!";
             Print.println(GREEN, statusText);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            statusText = "Not connected!";
+            Print.println(RED, statusText);
         }
         if (statusText.equals("Not connected!")) {
             try {
