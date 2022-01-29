@@ -20,36 +20,48 @@ public class CallbackHandler extends AbstractMethods implements IBaseHandler {
         prepare(update);
         String data = callbackQuery.getData();
         if ("join".equals(data)) {
-            bot.executeMessage(new DeleteMessage(chatId + "", message.getMessageId()));
-            SendMessage sendMessage = msgObject(chatId, SEND_PHONE.get("uz"));
-            sendMessage.setReplyMarkup(MarkupBoards.phoneButton());
-            bot.executeMessage(sendMessage);
+            joinToBot();
         } else if ("close".equals(data)) {
             bot.executeMessage(new DeleteMessage(chatId.toString(), message.getMessageId()));
         } else if (foundUnaccepted(data)) {
-            g_repository.acceptGroup(Long.parseLong(data));
-            List<Group> groupList = g_repository.getUnAcceptedList();
-            if (groupList.size() > 0) {
-                EditMessageText editMessageText = eMsgObject(chatId, update, PRESS_FOR_ACTIVATE.get("uz"));
-                editMessageText.setReplyMarkup(InlineBoards.prepareButtons(groupList));
-                bot.executeMessage(editMessageText);
-            } else {
-                EditMessageText editMessageText = eMsgObject(chatId, update, ALL_GROUPS_ACTIVATED1.get("uz"));
-                bot.executeMessage(editMessageText);
-            }
+            activateGroup(update, data);
         } else if (foundAccepted(data)) {
-            g_repository.unAcceptGroup(Long.parseLong(data));
-            List<Group> acceptedList = g_repository.getAcceptedList();
-            EditMessageText editMessageText = eMsgObject(chatId, update, "");
-            if (acceptedList.size() < 1) {
-                editMessageText.setText(ALL_GROUPS_DELETED.get("uz"));
-                bot.executeMessage(editMessageText);
-                return;
-            }
-            editMessageText.setText(PRESS_FOR_DELETE.get("uz"));
-            editMessageText.setReplyMarkup(InlineBoards.prepareButtons(acceptedList));
+            deactivateGroup(update, data);
+        }
+    }
+
+    private void deactivateGroup(Update update, String data) {
+        g_repository.unAcceptGroup(Long.parseLong(data));
+        List<Group> acceptedList = g_repository.getAcceptedList();
+        EditMessageText editMessageText = eMsgObject(chatId, update, "");
+        if (acceptedList.size() < 1) {
+            editMessageText.setText(ALL_GROUPS_DELETED.get("uz"));
+            bot.executeMessage(editMessageText);
+            return;
+        }
+        editMessageText.setText(PRESS_FOR_DELETE.get("uz"));
+        editMessageText.setReplyMarkup(InlineBoards.prepareButtons(acceptedList));
+        bot.executeMessage(editMessageText);
+    }
+
+    private void activateGroup(Update update, String data) {
+        g_repository.acceptGroup(Long.parseLong(data));
+        List<Group> groupList = g_repository.getUnAcceptedList();
+        if (groupList.size() > 0) {
+            EditMessageText editMessageText = eMsgObject(chatId, update, PRESS_FOR_ACTIVATE.get("uz"));
+            editMessageText.setReplyMarkup(InlineBoards.prepareButtons(groupList));
+            bot.executeMessage(editMessageText);
+        } else {
+            EditMessageText editMessageText = eMsgObject(chatId, update, ALL_GROUPS_ACTIVATED1.get("uz"));
             bot.executeMessage(editMessageText);
         }
+    }
+
+    private void joinToBot() {
+        bot.executeMessage(new DeleteMessage(chatId + "", message.getMessageId()));
+        SendMessage sendMessage = msgObject(chatId, SEND_PHONE.get("uz"));
+        sendMessage.setReplyMarkup(MarkupBoards.phoneButton());
+        bot.executeMessage(sendMessage);
     }
 
     private boolean foundUnaccepted(String Id) {
