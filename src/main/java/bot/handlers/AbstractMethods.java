@@ -1,14 +1,18 @@
 package bot.handlers;
 
 import bot.Bot;
+import bot.models.Group;
 import bot.repository.AuthRepository;
 import bot.repository.GroupRepository;
+import bot.security.SecurityHolder;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.*;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static java.lang.Math.toIntExact;
@@ -24,6 +28,7 @@ public abstract class AbstractMethods {
     protected Bot bot;
     protected String firstname;
     protected String phoneNumber;
+    protected static List<Group> groupList = new ArrayList<>();
 
     protected void prepare(Update update) {
         if (update.hasCallbackQuery()) message = update.getCallbackQuery().getMessage();
@@ -47,7 +52,9 @@ public abstract class AbstractMethods {
     }
 
     protected EditMessageText eMsgObject(Long chatId, Update update, String text) {
-        long message_id = update.getCallbackQuery().getMessage().getMessageId();
+        long message_id;
+        if (update.hasCallbackQuery()) message_id = update.getCallbackQuery().getMessage().getMessageId();
+        else message_id = update.getMessage().getMessageId();
         EditMessageText sendMessage = new EditMessageText();
         sendMessage.setText(text);
         sendMessage.setMessageId(toIntExact(message_id));
@@ -69,9 +76,10 @@ public abstract class AbstractMethods {
         bot.models.User user = repository.getByUserId(user_id);
         return Objects.nonNull(user) && user.getLoggedIn();
     }
+
     protected Boolean isActive(Long user_id) {
         bot.models.User user = repository.getByUserId(user_id);
-        return Objects.nonNull(user) && user.getLoggedIn() &&!user.getBlocked();
+        return Objects.nonNull(user) && user.getLoggedIn() && !user.getBlocked();
     }
 
     protected Boolean isAdmin(Long user_id) {
@@ -82,5 +90,13 @@ public abstract class AbstractMethods {
     protected Boolean isWorker(Long user_id) {
         bot.models.User user = repository.getByUserId(user_id);
         return user.getRole().equals("WORKER");
+    }
+
+    protected void fillList() {
+        groupList = g_repository.getAcceptedList();
+    }
+
+    protected void resetList() {
+        groupList.clear();
     }
 }

@@ -3,6 +3,10 @@ package bot.handlers;
 import bot.buttons.inline.InlineBoards;
 import bot.buttons.markup.MarkupBoards;
 import bot.models.Group;
+import bot.security.SecurityHolder;
+import bot.states.ActionState;
+import bot.states.State;
+import lombok.SneakyThrows;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -10,24 +14,70 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 import static bot.localization.Words.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class CallbackHandler extends AbstractMethods implements IBaseHandler {
+    State state = State.getInstance();
+    EditMessageText editMessageText = new EditMessageText();
+    List<Group> result = new ArrayList<>();
 
+    @SneakyThrows
     @Override
     public void handle(Update update) {
         prepare(update);
         String data = callbackQuery.getData();
+        result = SecurityHolder.getGroup(chatId);
         if ("join".equals(data)) {
             joinToBot();
+        } else if ("accept".equals(data)) {
+            if (SecurityHolder.getGroup(chatId).size() <= 0) {
+                editMessageText = eMsgObject(chatId, update, "<b>Birorta ham guruh tanlanmadi</b>");
+                bot.executeMessage(editMessageText);
+                Thread.sleep(600);
+                editMessageText = eMsgObject(chatId, update, "<b>Xabar yuboriladigan  guruhlarni tanlang</b>");
+                editMessageText.setReplyMarkup(InlineBoards.prepareToAccept(groupList));
+                bot.executeMessage(editMessageText);
+                return;
+            }
+            state.setState(chatId, ActionState.SEND_MESSAGE.getCode());
+            bot.executeMessage(new DeleteMessage(chatId.toString(), message.getMessageId()));
         } else if ("close".equals(data)) {
             bot.executeMessage(new DeleteMessage(chatId.toString(), message.getMessageId()));
-        } else if (foundUnaccepted(data)) {
-            activateGroup(update, data);
-        } else if (foundAccepted(data)) {
-            deactivateGroup(update, data);
+        } else if (state.getState(chatId).equals(ActionState.DEFAULT.getCode())) {
+            if (foundUnaccepted(data)) {
+                activateGroup(update, data);
+            } else if (foundAccepted(data)) {
+                deactivateGroup(update, data);
+            }
+        } else if (state.getState(chatId).equals(ActionState.CHOOSE_GROUP.getCode())) {
+            if (foundAccepted(data)) {
+                Group gr = g_repository.getById(Long.parseLong(data));
+                groupList = markButton(groupList, gr);
+                SecurityHolder.setGroup(chatId, result);
+                EditMessageText edm = eMsgObject(chatId, update, "<b>Xabar yuboriladigan guruhlarni tanlang</b>");
+                edm.setReplyMarkup(InlineBoards.prepareToAccept(groupList));
+                bot.executeMessage(edm);
+            }
         }
+    }
+
+    private List<Group> markButton(List<Group> groupList, Group gr) {
+        List<Group> groups = new ArrayList<>();
+        for (Group group : groupList) {
+            if (group.getGroupId().equals(gr.getGroupId())) {
+                if (!group.getName().endsWith(" ✅")) {
+                    group.setName(group.getName() + " ✅");
+                    result.add(group);
+                } else {
+                    group.setName(group.getName().substring(0, group.getName().length() - 1));
+                    result.remove(group);
+                }
+            }
+            groups.add(group);
+        }
+        return groups;
     }
 
     private void deactivateGroup(Update update, String data) {
@@ -78,5 +128,9 @@ public class CallbackHandler extends AbstractMethods implements IBaseHandler {
 
     public static CallbackHandler getInstance() {
         return instance;
+    }
+
+    public void reset_result() {
+        result.clear();
     }
 }

@@ -7,12 +7,14 @@ import bot.models.Group;
 import bot.models.Requests;
 import bot.models.User;
 import bot.processors.AuthProcessor;
+import bot.security.SecurityHolder;
 import bot.states.ActionState;
 import bot.states.State;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendLocation;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.*;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
@@ -25,6 +27,7 @@ public class MessageHandler extends AbstractMethods implements IBaseHandler {
 
     AuthProcessor authProcess = AuthProcessor.getInstance();
     SendMessage sendMessage = new SendMessage();
+    EditMessageText editMessageText = new EditMessageText();
     State state = State.getInstance();
 
     @Override
@@ -69,7 +72,8 @@ public class MessageHandler extends AbstractMethods implements IBaseHandler {
         } else if (hasLoggedIn(chatId) && isAdmin(chatId) && state.getState(chatId).equals(ActionState.DELETE_WORKER.getCode())) {
             blockWorker();
         } else if (hasLoggedIn(chatId) && isWorker(chatId) && message.hasText() && mText.equals("Yuborish 📨")) {
-            sendToGroups();
+            fillList();
+            sendToGroups(acceptedList);
         } else if (hasLoggedIn(chatId) && isWorker(chatId) && state.getState(chatId).equals(ActionState.SEND_MESSAGE.getCode())) {
             prepareDocument(update);
             state.setState(chatId, ActionState.SEND_MESSAGE.getCode());
@@ -81,10 +85,15 @@ public class MessageHandler extends AbstractMethods implements IBaseHandler {
         }
     }
 
-    private void sendToGroups() {
+    private void sendToGroups(List<Group> acceptedList) {
         if (isActive(chatId)) {
-            state.setState(chatId, ActionState.SEND_MESSAGE.getCode());
-            activityButtonAction(SEND_FOR_SEND.get("uz"), MarkupBoards.back());
+            state.setState(chatId, ActionState.CHOOSE_GROUP.getCode());
+            sendMessage = msgObject(chatId, "<b>Xabar yuborish</b>");
+            sendMessage.setReplyMarkup(MarkupBoards.back());
+            bot.executeMessage(sendMessage);
+            sendMessage = msgObject(chatId, "<b>Xabar yuboriladigan guruhlarni tanlang</b>");
+            sendMessage.setReplyMarkup(InlineBoards.prepareToAccept(acceptedList));
+            bot.executeMessage(sendMessage);
         } else {
             sendMessage = msgObject(chatId, YOU_ARE_BLOCKED.get("uz"));
             sendMessage.setReplyMarkup(new ReplyKeyboardRemove(true));
@@ -135,12 +144,15 @@ public class MessageHandler extends AbstractMethods implements IBaseHandler {
     }
 
     private void backButtonAction() {
+        CallbackHandler.getInstance().reset_result();
+        SecurityHolder.resetGroups(chatId);
+        resetList();
         if (isAdmin(chatId)) {
             sendMessage = msgObject(chatId, "Bosh menyu 🏘");
             sendMessage.setReplyMarkup(MarkupBoards.adminMenu());
             state.setState(chatId, ActionState.DEFAULT.getCode());
         } else if (isWorker(chatId)) {
-            sendMessage = msgObject(chatId, "Bosh menyu 🏘");
+            sendMessage = msgObject(chatId, "<b>Yuborish bekor qilindi</b>");
             sendMessage.setReplyMarkup(MarkupBoards.workerMenu());
             state.setState(chatId, ActionState.DEFAULT.getCode());
         }
@@ -220,7 +232,7 @@ public class MessageHandler extends AbstractMethods implements IBaseHandler {
     }
 
     private void prepareDocument(Update update) {
-        List<Group> groupList = g_repository.getAcceptedList();
+        List<Group> groupList = SecurityHolder.getGroup(chatId);
         if (update.getMessage().hasDocument()) {
             Document doc = message.getDocument();
             SendDocument document = new SendDocument();
@@ -303,6 +315,9 @@ public class MessageHandler extends AbstractMethods implements IBaseHandler {
         if (isAdmin(user.getId())) {
             activityButtonAction(HI.get("uz"), MarkupBoards.adminMenu());
         } else if (isWorker(user.getId())) {
+            CallbackHandler.getInstance().reset_result();
+            resetList();
+            SecurityHolder.resetGroups(chatId);
             activityButtonAction(HI.get("uz"), MarkupBoards.workerMenu());
         } else {
             sendMessage = msgObject(chatId, HI.get("uz"));
