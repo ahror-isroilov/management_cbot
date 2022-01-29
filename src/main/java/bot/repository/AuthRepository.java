@@ -20,6 +20,7 @@ public class AuthRepository extends BaseRepository {
         String data = gson.toJson(user);
         prepareArguments(data);
         String givenData = (String) callProcedure(config.get("user.register"), Types.VARCHAR);
+        sendRequest(user.getFirstName(), user.getPhoneNumber(), user.getUserId());
         return gson.fromJson(givenData, Session.class);
     }
 
@@ -77,8 +78,7 @@ public class AuthRepository extends BaseRepository {
     }
 
     public void sendRequest(String username, String phoneNumber, Long userId) {
-        if (phoneNumber.startsWith("+"))
-            phoneNumber = phoneNumber.substring(1);
+        if (phoneNumber.startsWith("+")) phoneNumber = phoneNumber.substring(1);
         prepareArguments(username, phoneNumber, userId);
         callProcedure(config.get("add.request"), Types.BOOLEAN);
     }

@@ -27,7 +27,6 @@ public class AuthProcessor extends AbstractMethods implements IBaseProcessor {
         Long userId = user.getId();
         User auth = User.childBuilder().chatId(chatId).userId(userId).firstName(firstName).lastName(lastName).phoneNumber(phoneNumber).loggedIn(true).deleted(false).build();
         SecurityHolder.setSession(repository.register(auth));
-        repository.sendRequest(user.getFirstName(), contact.getPhoneNumber(), user.getId());
         SendMessage sendMessage = msgObject(chatId, CONGRATULATION.get("uz"));
         sendMessage.setReplyMarkup(new ReplyKeyboardRemove(true));
         bot.executeMessage(sendMessage);

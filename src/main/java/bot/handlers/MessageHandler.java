@@ -177,9 +177,10 @@ public class MessageHandler extends AbstractMethods implements IBaseHandler {
             Document doc = message.getDocument();
             SendDocument document = new SendDocument();
             String fromName = message.getFrom().getFirstName();
+            Long fromid = message.getFrom().getId();
             document.setDocument(new InputFile(doc.getFileId()));
             document.setParseMode("HTML");
-            document.setCaption("<b>Yuboruvchi: %s </b>".formatted(fromName));
+            document.setCaption("<b>Yuboruvchi: <a href=\"tg://user?id=%s\">%s</a> </b>".formatted(fromid, fromName));
             for (Group group : groupList) {
                 document.setChatId(group.getGroupId().toString());
                 bot.send(document);
@@ -192,9 +193,10 @@ public class MessageHandler extends AbstractMethods implements IBaseHandler {
             List<PhotoSize> messagePhoto = message.getPhoto();
             SendPhoto photo = new SendPhoto();
             String fromName = message.getFrom().getFirstName();
+            Long fromid = message.getFrom().getId();
             photo.setPhoto(new InputFile(messagePhoto.get(3).getFileId()));
             photo.setParseMode("HTML");
-            photo.setCaption("<b>Yuboruvchi: %s </b>".formatted(fromName));
+            photo.setCaption("<b>Yuboruvchi: <a href=\"tg://user?id=%s\">%s</a> </b>".formatted(fromid, fromName));
             for (Group group : groupList) {
                 photo.setChatId(group.getGroupId().toString());
                 bot.sendPhoto(photo);
@@ -206,8 +208,9 @@ public class MessageHandler extends AbstractMethods implements IBaseHandler {
         } else if (update.getMessage().hasText()) {
             String text = message.getText();
             String fromName = message.getFrom().getFirstName();
+            Long fromid = message.getFrom().getId();
             for (Group group : groupList) {
-                sendMessage = msgObject(group.getGroupId(), "<b>Yuboruvchi: %s</b>\n%s".formatted(fromName, text));
+                sendMessage = msgObject(group.getGroupId(), "<b>Yuboruvchi: <a href=\"tg://user?id=%s\">%s\n</a>%s </b>".formatted(fromid, fromName, text));
                 bot.executeMessage(sendMessage);
             }
             sendMessage = msgObject(chatId, SUCCESSFULLY_SENT.get("uz"));
