@@ -6,9 +6,9 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum Languages {
-    UZ("O'zbek"),
-    RU("Русский"),
-    EN("English"),
+    UZ("uz"),
+    RU("ru"),
+    EN("en"),
     DEFAULT("none");
     private final String code;
 }

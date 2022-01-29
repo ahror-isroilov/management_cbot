@@ -3,13 +3,12 @@ package bot.handlers;
 import bot.buttons.inline.InlineBoards;
 import bot.buttons.markup.MarkupBoards;
 import bot.models.Group;
-import bot.processors.AuthProcessor;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
+
+import static bot.localization.Words.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -22,7 +21,7 @@ public class CallbackHandler extends AbstractMethods implements IBaseHandler {
         String data = callbackQuery.getData();
         if ("join".equals(data)) {
             bot.executeMessage(new DeleteMessage(chatId + "", message.getMessageId()));
-            SendMessage sendMessage = msgObject(chatId, "<b>Telefon raqamingizni yuboring 👇</b>");
+            SendMessage sendMessage = msgObject(chatId, SEND_PHONE.get("uz"));
             sendMessage.setReplyMarkup(MarkupBoards.phoneButton());
             bot.executeMessage(sendMessage);
         } else if ("close".equals(data)) {
@@ -31,10 +30,11 @@ public class CallbackHandler extends AbstractMethods implements IBaseHandler {
             g_repository.acceptGroup(Long.parseLong(data));
             List<Group> groupList = g_repository.getUnAcceptedList();
             if (groupList.size() > 0) {
-                EditMessageText editMessageText = eMsgObject(chatId, update, "<b>Guruhlarni faollashtirish uchun ularning ustiga bosing</b>");
+                EditMessageText editMessageText = eMsgObject(chatId, update, PRESS_FOR_ACTIVATE.get("uz"));
                 editMessageText.setReplyMarkup(InlineBoards.prepareButtons(groupList));
+                bot.executeMessage(editMessageText);
             } else {
-                EditMessageText editMessageText = eMsgObject(chatId, update, "<b>barcha guruhlar faollashtirildi!</b>");
+                EditMessageText editMessageText = eMsgObject(chatId, update, ALL_GROUPS_ACTIVATED1.get("uz"));
                 bot.executeMessage(editMessageText);
             }
         } else if (foundAccepted(data)) {
@@ -42,11 +42,11 @@ public class CallbackHandler extends AbstractMethods implements IBaseHandler {
             List<Group> acceptedList = g_repository.getAcceptedList();
             EditMessageText editMessageText = eMsgObject(chatId, update, "");
             if (acceptedList.size() < 1) {
-                editMessageText.setText("<b>Barcha guruhlar o'chirildi!</b>");
+                editMessageText.setText(ALL_GROUPS_DELETED.get("uz"));
                 bot.executeMessage(editMessageText);
                 return;
             }
-            editMessageText.setText("<b>Guruhlarni olib tashlash uchun ularni ustiga bosing</b>");
+            editMessageText.setText(PRESS_FOR_DELETE.get("uz"));
             editMessageText.setReplyMarkup(InlineBoards.prepareButtons(acceptedList));
             bot.executeMessage(editMessageText);
         }
