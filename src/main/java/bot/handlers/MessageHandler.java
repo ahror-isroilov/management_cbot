@@ -22,6 +22,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRem
 import static bot.localization.Words.*;
 
 import java.util.List;
+import java.util.Objects;
 
 public class MessageHandler extends AbstractMethods implements IBaseHandler {
 
@@ -62,23 +63,26 @@ public class MessageHandler extends AbstractMethods implements IBaseHandler {
             state.setState(chatId, ActionState.ADD_WORKER.getCode());
             sendMessage = msgObject(chatId, ENTER_PHONE_FADD.get("uz"));
             bot.executeMessage(sendMessage);
-        } else if (hasLoggedIn(chatId) && isAdmin(chatId) && state.getState(chatId).equals(ActionState.ADD_WORKER.getCode())) {
+        } else if (hasLoggedIn(chatId) && isAdmin(chatId) && Objects.nonNull(state) && state.getState(chatId).equals(ActionState.ADD_WORKER.getCode())) {
             addWorker();
         } else if (hasLoggedIn(chatId) && isAdmin(chatId) && message.hasText() && mText.equals("Ishchini bloklash ⛔️")) {
             state.setState(chatId, ActionState.DELETE_WORKER.getCode());
             sendMessage = msgObject(chatId, ENTER_PHONE_FREMOVE.get("uz"));
             bot.executeMessage(sendMessage);
-        } else if (hasLoggedIn(chatId) && isAdmin(chatId) && state.getState(chatId).equals(ActionState.DELETE_WORKER.getCode())) {
+        } else if (hasLoggedIn(chatId) && isAdmin(chatId) && Objects.nonNull(state) && state.getState(chatId).equals(ActionState.DELETE_WORKER.getCode())) {
             blockWorker();
         } else if (hasLoggedIn(chatId) && isWorker(chatId) && message.hasText() && mText.equals("Yuborish 📨")) {
             fillList();
             sendToGroups(acceptedList);
-        } else if (hasLoggedIn(chatId) && isWorker(chatId) && state.getState(chatId).equals(ActionState.SEND_MESSAGE.getCode())) {
+        } else if (hasLoggedIn(chatId) && isWorker(chatId) && Objects.nonNull(state) && state.getState(chatId).equals(ActionState.SEND_MESSAGE.getCode())) {
             prepareDocument(update);
             state.setState(chatId, ActionState.SEND_MESSAGE.getCode());
         } else {
             if (chatId > 0) {
                 sendMessage = msgObject(chatId, WRONG_COMMAND.get("uz"));
+                bot.executeMessage(sendMessage);
+            } else if (chatId < 0 && message.getText().equals("SALOM")) {
+                sendMessage = msgObject(-760638128, "ASSALOMU ALAYKUM");
                 bot.executeMessage(sendMessage);
             }
         }
@@ -253,10 +257,9 @@ public class MessageHandler extends AbstractMethods implements IBaseHandler {
             SendPhoto photo = new SendPhoto();
             String fromName = message.getFrom().getFirstName();
             Long fromid = message.getFrom().getId();
-            photo.setPhoto(new InputFile(messagePhoto.get(3).getFileId()));
+            photo.setPhoto(new InputFile(messagePhoto.get(1).getFileId()));
             photo.setParseMode("HTML");
-            caption = photo.getCaption();
-            photo.setCaption(caption + "\n\n<b>Yuboruvchi: <a href=\"tg://user?id=%s\">%s</a> </b>".formatted(fromid, fromName));
+            photo.setCaption("\n\n<b>Yuboruvchi: <a href=\"tg://user?id=%s\">%s</a> </b>".formatted(fromid, fromName));
             for (Group group : groupList) {
                 photo.setChatId(group.getGroupId().toString());
                 bot.sendPhoto(photo);
