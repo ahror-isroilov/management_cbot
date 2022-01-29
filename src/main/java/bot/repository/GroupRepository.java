@@ -40,6 +40,14 @@ public class GroupRepository extends BaseRepository {
         return gson.fromJson(data, typeToken);
     }
 
+    public List<Group> getAllList() {
+        prepareArguments("null");
+        Type typeToken = new TypeToken<List<Group>>() {
+        }.getType();
+        String data = (String) callProcedure(config.get("group.all.list"), Types.VARCHAR);
+        return gson.fromJson(data, typeToken);
+    }
+
     public List<Group> getUnAcceptedList() {
         prepareArguments("null");
         Type typeToken = new TypeToken<List<Group>>() {
@@ -52,6 +60,11 @@ public class GroupRepository extends BaseRepository {
         prepareArguments(id);
         String data = (String) callProcedure(config.get("group.getById"), Types.VARCHAR);
         return gson.fromJson(data, Group.class);
+    }
+
+    public void updateName(String name, Long id) {
+        prepareArguments(name, id);
+        callProcedure(config.get("update.name"), Types.BOOLEAN);
     }
 
     private static final GroupRepository instance = new GroupRepository();

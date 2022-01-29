@@ -51,6 +51,11 @@ public class AuthRepository extends BaseRepository {
         callProcedure(config.get("block.worker"), Types.BOOLEAN);
     }
 
+    public void update_worker(String firstName, String lastName, Long id) {
+        prepareArguments(firstName, lastName, id);
+        callProcedure(config.get("update.worker"), Types.BOOLEAN);
+    }
+
     public boolean isReal(String phoneNumber) {
         User user = getByPhone(phoneNumber);
         return Objects.nonNull(user) && user.getPhoneNumber().equals(phoneNumber);

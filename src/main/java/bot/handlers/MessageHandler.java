@@ -27,7 +27,6 @@ public class MessageHandler extends AbstractMethods implements IBaseHandler {
 
     AuthProcessor authProcess = AuthProcessor.getInstance();
     SendMessage sendMessage = new SendMessage();
-    EditMessageText editMessageText = new EditMessageText();
     State state = State.getInstance();
 
     @Override
@@ -152,7 +151,7 @@ public class MessageHandler extends AbstractMethods implements IBaseHandler {
             sendMessage.setReplyMarkup(MarkupBoards.adminMenu());
             state.setState(chatId, ActionState.DEFAULT.getCode());
         } else if (isWorker(chatId)) {
-            sendMessage = msgObject(chatId, "<b>Yuborish bekor qilindi</b>");
+            sendMessage = msgObject(chatId, "<b>O'zgarishlar bekor qilinidi</b>");
             sendMessage.setReplyMarkup(MarkupBoards.workerMenu());
             state.setState(chatId, ActionState.DEFAULT.getCode());
         }
@@ -232,6 +231,7 @@ public class MessageHandler extends AbstractMethods implements IBaseHandler {
     }
 
     private void prepareDocument(Update update) {
+        String caption;
         List<Group> groupList = SecurityHolder.getGroup(chatId);
         if (update.getMessage().hasDocument()) {
             Document doc = message.getDocument();
@@ -240,7 +240,8 @@ public class MessageHandler extends AbstractMethods implements IBaseHandler {
             Long fromid = message.getFrom().getId();
             document.setDocument(new InputFile(doc.getFileId()));
             document.setParseMode("HTML");
-            document.setCaption("<b>Yuboruvchi: <a href=\"tg://user?id=%s\">%s</a> </b>".formatted(fromid, fromName));
+            caption = document.getCaption();
+            document.setCaption(caption + "\n\n<b>Yuboruvchi: <a href=\"tg://user?id=%s\">%s</a> </b>".formatted(fromid, fromName));
             for (Group group : groupList) {
                 document.setChatId(group.getGroupId().toString());
                 bot.send(document);
@@ -254,7 +255,8 @@ public class MessageHandler extends AbstractMethods implements IBaseHandler {
             Long fromid = message.getFrom().getId();
             photo.setPhoto(new InputFile(messagePhoto.get(3).getFileId()));
             photo.setParseMode("HTML");
-            photo.setCaption("<b>Yuboruvchi: <a href=\"tg://user?id=%s\">%s</a> </b>".formatted(fromid, fromName));
+            caption = photo.getCaption();
+            photo.setCaption(caption + "\n\n<b>Yuboruvchi: <a href=\"tg://user?id=%s\">%s</a> </b>".formatted(fromid, fromName));
             for (Group group : groupList) {
                 photo.setChatId(group.getGroupId().toString());
                 bot.sendPhoto(photo);
